@@ -1,0 +1,129 @@
+import scala.util.Random
+
+// Define Animal class
+abstract class Animal(val name: String) {
+  def sleep(): Unit
+}
+
+// Define Feline class
+abstract class Feline(name: String) extends Animal(name) {
+  def makeNoise(): Unit
+  def play(): Unit
+  override def sleep(): Unit = println(s"$name the $getClass sleeps.")
+}
+
+// Define Cat class
+class Cat(name: String) extends Feline(name) {
+  override def makeNoise(): Unit = println(s"$name the Cat meows.")
+  override def play(): Unit = println(s"$name the Cat plays with a toy.")
+}
+
+// Define Dog class
+class Dog(name: String) extends Animal(name) {
+  override def sleep(): Unit = println(s"$name the Dog sleeps.")
+  def makeNoise(): Unit = println(s"$name the Dog barks.")
+  def play(): Unit = println(s"$name the Dog plays fetch.")
+}
+
+// Define Staff class
+abstract class Staff {
+  def arrive(): Unit
+  def lunch(): Unit
+  def leave(): Unit
+}
+
+// Define Manager class
+class Manager extends Staff {
+  override def arrive(): Unit = println("0800: Manager arrives.")
+  override def lunch(): Unit = println("1200: Manager goes for lunch.")
+  override def leave(): Unit = println("1800: Manager leaves.")
+  def openStore(): Unit = println("0800: Manager opens the store.")
+  def closeStore(): Unit = println("1800: Manager closes the store.")
+}
+
+// Define Clerk class
+class Clerk extends Staff {
+  override def arrive(): Unit = println("0900: Clerk arrives.")
+  override def lunch(): Unit = println("1300: Clerk goes for lunch.")
+  override def leave(): Unit = println("1700: Clerk leaves.")
+
+  def feedAnimals(animals: List[Animal]): Unit = {
+    println("0900: Clerk feeds the animals.")
+    animals.foreach {
+      case feline: Feline => feline.makeNoise()
+      case dog: Dog => dog.makeNoise()
+    }
+  }
+
+  def playAnimals(animals: List[Animal]): Unit = {
+    println("1100: Clerk plays with the animals.")
+    animals.foreach {
+      case feline: Feline => feline.play()
+      case dog: Dog => dog.play()
+    }
+  }
+
+  def sellAnimals(animals: List[Animal]): List[Animal] = {
+    println("1600: Clerk sells animals.")
+    val random = new Random()
+    animals.map {
+      case feline: Feline =>
+        if (random.nextDouble() <= 0.2) {
+          println(s"1600: ${feline.name} the Cat is sold!")
+          new Cat(s"${feline.name} Jr.")
+        } else feline
+      case dog: Dog =>
+        if (random.nextDouble() <= 0.2) {
+          println(s"1600: ${dog.name} the Dog is sold!")
+          new Dog(s"${dog.name} Jr.")
+        } else dog
+    }
+  }
+}
+
+// Define Clock object
+object Clock {
+  var day = 1
+  var hour = 800
+
+  def announceHour(hour: Int): Unit = {
+    hour match {
+      case 800 => println("0800: Manager arrives and opens the store.")
+      case 900 => println("0900: Clerk arrives and feeds the animals.")
+      case 1100 => println("1100: Clerk plays with the animals.")
+      case 1200 => println("1200: Manager goes for lunch.")
+      case 1300 => println("1300: Clerk goes for lunch.")
+      case 1600 => println("1600: Clerk sells animals.")
+      case 1700 => println("1700: Clerk leaves.")
+      case 1800 => println("1800: Manager closes the store and leaves.")
+      case _ => // Do nothing
+    }
+  }
+
+  def advanceTime(): Unit = {
+    hour += 100
+    if (hour == 1900) {
+      hour = 800
+      day += 1
+      println(s"Day $day begins.")
+    }
+  }
+}
+
+object PetStore {
+  def main(args: Array[String]): Unit = {
+    val manager = new Manager
+    val clerk = new Clerk
+    val cats = List(new Cat("Fluffy"), new Cat("Whiskers"), new Cat("Mittens"))
+    val dogs = List(new Dog("Rex"), new Dog("Buddy"), new Dog("Max"))
+
+    for (_ <- 1 to 3) {
+      println(s"Day ${Clock.day} begins.")
+      while (Clock.hour < 1900) {
+        Clock.announceHour(Clock.hour)
+        Clock.advanceTime()
+      }
+      Clock.day += 1
+    }
+  }
+}
