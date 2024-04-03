@@ -1,0 +1,80 @@
+import scala.util.Random
+
+// Define the SixLitle class
+class SixLitle {
+  // Define attributes to store words and hints
+  var words: List[String] = List()
+  var hints: List[String] = List()
+
+  // Method to ask for six pairs of string inputs
+  def Ask(): Unit = {
+    println("Enter six pairs of words and hints:")
+    var i = 0
+    while (i < 6) {
+      var word = ""
+      var hint = ""
+      var valid = false
+      while (!valid) {
+        print("Enter a word (at least 4 characters long): ")
+        word = scala.io.StdIn.readLine()
+        if (word != null && word.length >= 4) valid = true
+      }
+      print("Enter a hint: ")
+      hint = scala.io.StdIn.readLine()
+      words = word :: words
+      hints = hint :: hints
+      i += 1
+    }
+  }
+
+  // Method to prepare words by breaking them in half, capitalize parts, and shuffle
+  def Prepare(): Unit = {
+    var tokens: List[String] = List()
+    for (word <- words) {
+      val halfLength = (word.length + 1) / 2
+      val firstHalf = word.substring(0, halfLength).toUpperCase()
+      val secondHalf = word.substring(halfLength).toUpperCase()
+      tokens = firstHalf :: secondHalf :: tokens
+    }
+    words = Random.shuffle(tokens).reverse
+  }
+
+  // Method to display tokens, hints, and answer key
+  def Display(): Unit = {
+    println("Six Little Words (Scala)")
+    println("Partial Words:")
+    var i = 0
+    while (i < words.length) {
+      println(words.slice(i, i + 4).mkString(" "))
+      i += 4
+    }
+    println("\nHints:")
+    var j = 1
+    while (j <= hints.length) {
+      println(s"$j. ${hints(j - 1)}")
+      j += 1
+    }
+    println("\nAnswer Key:")
+    words.grouped(2).foreach { case List(word1, word2) =>
+      println(s"$word1\n$word2\n")
+    }
+  }
+
+  // Method to clear collections, call Ask, Prepare, and Display
+  def Run(): Unit = {
+    words = List()
+    hints = List()
+    Ask()
+    Prepare()
+    Display()
+  }
+}
+
+object Main {
+  def main(args: Array[String]): Unit = {
+    // Instantiate an object from the SixLitle class
+    val game = new SixLitle()
+    // Call the Run method
+    game.Run()
+  }
+}

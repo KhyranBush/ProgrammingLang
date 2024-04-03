@@ -1,0 +1,27 @@
+// Define the Person class
+class Person(var name: String)
+
+object Main {
+  def main(args: Array[String]): Unit = {
+    // Create an instance of Person with your first name
+    val myName = new Person("Khyran")
+    
+    // Set the instance's name attribute to your first and last name
+    myName.name = "Khyran Bush"
+    
+    // Display your name from the object
+    println("Name: " + myName.name)
+    
+    // Sort and display your name's characters in alphabetical order
+    val sortedName = myName.name.sorted
+    println("Sorted Name: " + sortedName)
+    
+    // Reverse and display your name
+    val reversedName = myName.name.reverse
+    println("Reversed Name: " + reversedName)
+    
+    // Sort and display your name in reverse alphabetical order
+    val reverseSortedName = myName.name.sorted(Ordering.Char.reverse)
+    println("Reverse Sorted Name: " + reverseSortedName)
+  }
+}
