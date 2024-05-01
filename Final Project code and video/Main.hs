@@ -1,0 +1,69 @@
+-- Importing System.IO module for input/output operations
+import System.IO
+
+-- Entry point of the program
+main :: IO ()
+main = do
+    -- Displaying welcome message and available commands
+    putStrLn "Welcome to Todo List Application!"
+    putStrLn "Available commands:"
+    putStrLn "  - add <task>: Add a new task"
+    putStrLn "  - view: View all tasks"
+    putStrLn "  - done <index>: Mark a task as done"
+    putStrLn "  - remove <index>: Remove a task"
+    putStrLn "  - quit: Quit the application"
+    -- Starting the task handling process with an empty task list
+    handleTasks []
+
+-- Function to handle tasks with a given task list
+handleTasks :: [String] -> IO ()
+handleTasks tasks = do
+    putStr "> "  -- Prompting the user for input
+    command <- getLine  -- Reading user input
+    case words command of  -- Splitting user input into words and matching against patterns
+        -- Add command: Adds a new task to the task list
+        ["add", task] -> handleTasks (task : tasks)
+        -- View command: Displays all tasks in the task list
+        ["view"] -> viewTasks tasks >> handleTasks tasks
+        -- Done command: Marks a task as done based on its index
+        ["done", indexStr] -> do
+            let index = read indexStr :: Int  -- Converting index string to integer
+            if validIndex index tasks  -- Checking if the index is valid
+                then handleTasks (markTaskDone index tasks)  -- Marking the task as done
+                else putStrLn "Invalid index" >> handleTasks tasks  -- Handling invalid index
+        -- Remove command: Removes a task from the task list based on its index
+        ["remove", indexStr] -> do
+            let index = read indexStr :: Int  -- Converting index string to integer
+            if validIndex index tasks  -- Checking if the index is valid
+                then handleTasks (removeTask index tasks)  -- Removing the task
+                else putStrLn "Invalid index" >> handleTasks tasks  -- Handling invalid index
+        -- Quit command: Exits the application
+        ["quit"] -> putStrLn "Goodbye!"
+        -- Handling invalid commands
+        _ -> putStrLn "Invalid command" >> handleTasks tasks
+
+-- Function to display all tasks with their indices
+viewTasks :: [String] -> IO ()
+viewTasks tasks = do
+    putStrLn "Your tasks:"
+    mapM_ putStrLn (zipWith formatTask [1..] tasks)
+
+-- Function to format a task with its index
+formatTask :: Int -> String -> String
+formatTask index task = show index ++ ". " ++ task
+
+-- Function to mark a task as done based on its index
+markTaskDone :: Int -> [String] -> [String]
+markTaskDone index tasks = 
+    let (before, _:after) = splitAt (index - 1) tasks  -- Splitting the task list at the specified index
+    in before ++ "DONE" : after  -- Adding "DONE" to the task at the specified index
+
+-- Function to remove a task from the task list based on its index
+removeTask :: Int -> [String] -> [String]
+removeTask index tasks =
+    let (before, _:after) = splitAt (index - 1) tasks  -- Splitting the task list at the specified index
+    in before ++ after  -- Combining the parts before and after the specified index
+
+-- Function to check if an index is valid for a given list
+validIndex :: Int -> [a] -> Bool
+validIndex index xs = index >= 1 && index <= length xs  -- Checking if the index is within the range of the list
